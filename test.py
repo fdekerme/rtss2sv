@@ -3,6 +3,7 @@ import numpy as np
 import os
 from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom.minidom import parseString
+from scipy.interpolate import BSpline, make_interp_spline
 
 def parse_ROINumber(ds, roi_name):
     for roi in ds.StructureSetROISequence:
@@ -39,16 +40,17 @@ def rtss2ctgr(rtss, roi_name, output_path):
     lofting_parameters.set('num_modes', '1')
 
     roi_number = parse_ROINumber(rtss, roi_name)
+    control_point_path = {}
 
     # Iterate over each contour in the structure
     for roi in rtss.ROIContourSequence:
         if roi.ReferencedROINumber == roi_number:
-            for j, contour_sequence in enumerate(roi.ContourSequence):
+            for contour_sequence in roi.ContourSequence:
                 # Add the contour element
                 contour = SubElement(timestep, 'contour')
-                contour.set('id', '0')
+                contour.set('id', str(contour_sequence.ContourNumber))
                 contour.set('type', 'Contour')
-                contour.set('method', 'LevelSet')
+                contour.set('method', 'Manual')
                 if contour_sequence.ContourGeometricType == 'CLOSED_PLANAR':
                     contour.set('closed', 'true')
                 else:
@@ -65,9 +67,9 @@ def rtss2ctgr(rtss, roi_name, output_path):
 
                 # Add the pos element
                 pos = SubElement(path_point, 'pos')
-                pos.set('x', '-1.89270514490339')
-                pos.set('y', '-1.72976277330768')
-                pos.set('z', '12.915622113488325')
+                pos.set('x', '0.0')
+                pos.set('y', '0.0')
+                pos.set('z', '0.0')
 
                 # Add the tangent element
                 tangent = SubElement(path_point, 'tangent')
@@ -87,18 +89,60 @@ def rtss2ctgr(rtss, roi_name, output_path):
                 # Add the contour_points element (interpolated points from the control points)
                 contour_points = SubElement(contour, 'contour_points')
 
-                points = np.array(contour_sequence.ContourData)
+                points = np.array(contour_sequence.ContourData) * 0.1
                 reshaped_points = points.reshape(-1, 3)
+
+                centroid = np.mean(reshaped_points, axis=0)
+                control_point_path[contour_sequence.ContourNumber] = centroid
+
                 for k, point in enumerate(reshaped_points):
                     SubElement(control_points, 'point', id=str(k), x=str(point[0]), y=str(point[1]), z=str(point[2]))
                     SubElement(contour_points, 'point', id=str(k), x=str(point[0]), y=str(point[1]), z=str(point[2]))
 
-
+    # Generate  and write the .pth file
+    path = generate_pth(control_point_path)
 
     # Write the .ctgr file
-    xml = parseString(tostring(root, encoding='UTF-8')).toprettyxml(indent="   ")
-    with open(os.path.join(output_path,roi_name + ".ctgr"), 'w') as f:
-        f.write(xml)
+    xml_ctgr = parseString(tostring(root, encoding='UTF-8')).toprettyxml(indent="   ")
+    with open(os.path.join(output_path, roi_name + ".ctgr"), 'w') as f:
+        f.write(xml_ctgr)
+
+    # Write the .pth file
+    xml_pth = parseString(tostring(path, encoding='UTF-8')).toprettyxml(indent="   ")
+    with open(os.path.join(output_path, roi_name + ".pth"), 'w') as f:
+        f.write(xml_pth)
+
+
+
+def generate_pth(control_point_path):
+
+    # Create the root path element
+    path = Element('path', id='1', method='0', calculation_number='', spacing='0', version='1.0', reslice_size='1', point_2D_display_size='', point_size='')
+
+    # Create a timestep element and append it to the root
+    timestep = SubElement(path, 'timestep', id='0')
+
+    # Create a path_element and append it to timestep
+    path_element = SubElement(timestep, 'path_element', method='0', calculation_number='', spacing='0')
+
+    # Create control_points and path_points elements and append them to path_element
+    control_points = SubElement(path_element, 'control_points')
+    path_points = SubElement(path_element, 'path_points')
+
+    # Create point elements and append them to control_points
+    for id, centroid in control_point_path.items():
+        SubElement(control_points, 'point', id=str(id), x=str(centroid[0]), y=str(centroid[1]), z=str(centroid[2]))
+
+        # Create a path_point element with pos, tangent, and rotation elements
+        path_point = SubElement(path_points, 'path_point', id=str(id))
+        SubElement(path_point, 'pos', x='0.0', y='0.0', z='0.0')
+        SubElement(path_point, 'tangent', x='0.0', y='0.0', z='0.0')
+        SubElement(path_point, 'rotation', x='0.0', y='0.0', z='0.0')
+    
+    return path
+
+
+
 
 rtss_path = "1.3.12.2.1107.5.1.4.49226.30000019112706455609300000818--1.2.276.0.7230010.3.1.4.296486144.178182.1685377991.264831_rtss.dcm"  
 output_path = "C://Users//franc//Documents//Code_python//dcm2ctgr//output"
