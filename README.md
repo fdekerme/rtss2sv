@@ -21,7 +21,7 @@ and then get all the methods with
 import sv
 help(sv.segmentation.Contour())
 ```
-SimVascular's PythonAPI is in beta. As a result, not all functions are available (see https://simtk.org/plugins/phpBB/viewtopicPhpbb.php?f=188&t=17705&p=49311&start=0&view=). In particular, the code could be greatly simplified if sv.segmentation.Series() had the same functions as sv.pathplanning.Series() (a constructor in particular).
+SimVascular's PythonAPI is in beta. As a result, not all functions are available (see https://simtk.org/plugins/phpBB/viewtopicPhpbb.php?f=188&t=17705&p=49311&start=0&view=). In particular, the code could be greatly simplified if `sv.segmentation.Series()` had the same functions as `sv.pathplanning.Series()` (a constructor in particular).
 
 Several resources are available:
 - Official documentation: https://simvascular.github.io/documentation/python_interface.html
