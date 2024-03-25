@@ -1,7 +1,7 @@
 This script converts DICOM RTStrucure (RTSS) files into SimVascular-readable path (.pth) and segmentation (.ctgr) files.
 
 To use it:
-1) Use parse_rtss from the parse_rtss.py file to generate a .csv file "contour_data.csv" containing a dictionary. This dictionary represents the contours of every structure present in the RTSS (only those selected in roi_names).
+1) Use 'parse_rtss' from the parse_rtss.py file to generate a .csv file "contour_data.csv" containing a dictionary. This dictionary represents the contours of every structure present in the RTSS (only those selected in roi_names).
 
 2) SimVascular's PythonAPI isn't easy to install (with pip install sv, for example) and it's not possible (I think, to check) to install a third-party package (like pydicom, for example). As a result, you need to run the main.py code with the following function (or equivalent under Linux/MacOS, see https://simvascular.github.io/documentation/python_interface.html):
 
