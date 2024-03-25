@@ -1,3 +1,5 @@
+# dcm2ctgr
+
 This script converts DICOM RTStrucure (RTSS) files into SimVascular-readable path (.pth) and segmentation (.ctgr) files.
 
 To use it:
