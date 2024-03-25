@@ -5,14 +5,6 @@ import os
 from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom.minidom import parseString
 
-
-# ######################################
-# This script is used to calculate the
-# angle between the planes of two
-# contours. (contour_id1, contour_id2)
-# To lauch this code: 
-# Start-Process -FilePath "C:\Program Files\SimVascular\SimVascular\2023-03-27\sv.bat"  -NoNewWindow -ArgumentList "--python", "-- C:\Users\franc\Documents\Code_python\dcm2ctgr\main.py"
-# ######################################
 # https://github.com/SimVascular/SimVascular-Tests/blob/master/new-api-tests/pathplanning/create.py
 # use help(sv.pathplanning) to get the list of functions
 
@@ -47,6 +39,23 @@ def _get_control_points_id(path):
 
 
 def generate_contour(cp, id, time_step, path, curve_id, scaling_factor = 1.0):
+    """
+    Generate a contour element for a given control point.
+
+    Args:
+        cp (list): List of control points.
+        id (int): ID of the contour.
+        time_step (Element): XML element representing the time step.
+        path (Path): Path object containing curve information.
+        curve_id (int): ID of the curve.
+        scaling_factor (float, optional): Scaling factor for the contour points. Defaults to 1.0.
+
+    Raises:
+        ValueError: If the path control point does not match the contour control point.
+
+    Returns:
+        None
+    """
 
     # path.get_curve_point(curve_id), path.get_control_point(id) and seg.get_center() should be the same point
     if path.get_curve_point(curve_id) != path.get_control_points()[id]:
@@ -92,8 +101,28 @@ def generate_contour(cp, id, time_step, path, curve_id, scaling_factor = 1.0):
 
 
 def rtss2pth(contour_data, roi_name, roi_id, output_path, scaling_factor = 1.0):
-    ''' Create a segmentation from a path curve point.
-    https://github.com/SimVascular/SimVascular-Tests/blob/master/new-api-tests/segmentation/polygon-path.py
+    '''Create a segmentation from a path curve point.
+
+    This function takes contour data, ROI name, ROI ID, output path, and an optional scaling factor as input.
+    It creates a segmentation from a path curve point using the SimVascular library.
+
+    Args:
+        contour_data (dict): A dictionary containing contour data generated with parse_rtss.py.
+        roi_name (str): The name of the ROI.
+        roi_id (int): The ID of the ROI.
+        output_path (str): The path where the output file will be saved.
+        scaling_factor (float, optional): A scaling factor to apply to the contour points. Defaults to 1.0.
+
+    Returns:
+        sv.pathplanning.Path: The created path.
+
+    References:
+        - SimVascular GitHub repository: https://github.com/SimVascular/SimVascular-Tests/blob/master/new-api-tests/segmentation/polygon-path.py
+
+    Note:
+        - The code for creating a contour series is currently commented out as it is not functional due to the beta status of the SimVascular Python API.
+        - For documentation on the SimVascular library, you can use the `help(sv.segmentation.Series())` command in the SimVascular shell.
+
     '''
     number_of_subdivision = 10
     path = sv.pathplanning.Path()
