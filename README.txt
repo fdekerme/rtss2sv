@@ -36,11 +36,6 @@ More things to note:
 ```
 	as well as the
 
-	`_get_control_points_id(path)`
+	_get_control_points_id(path)
 
-may seem strange. The problem is the following: I generate the path's control points via RTSS contours (`seg.get_center()`). 
-I then define the path via `path.set_control_points(path_control_points)`. The API then automatically interpolates between these points to form a "curve". 
-So, a Path may have 20 control points, but its Curve is made up of 200 points. Each of these points is characterized by its ID. 
-However, once the Path has been generated, there is no method (as far as I know) for tracing the ID of the control points. 
-And it's precisely at these control points that the segmentation points are located. 
-This code can therefore be used to find out the ID of the control points in the interpolated curve.  
+	may seem strange. The problem is the following: I generate the path's control points via RTSS contours (seg.get_center()). I then define the path via path.set_control_points(path_control_points). The API then automatically interpolates between these points to form a "curve". So, a Path may have 20 control points, but its Curve is made up of 200 points. Each of these points is characterized by its ID. However, once the Path has been generated, there is no method (as far as I know) for tracing the ID of the control points. And it's precisely at these control points that the segmentation points are located. This code can therefore be used to find out the ID of the control points in the interpolated curve.  
