@@ -14,7 +14,7 @@ Start-Process -FilePath "C:\Program Files\SimVascular\SimVascular\2023-03-27\sv.
 A simple prompt can be launched with:
 
 ```powershell
-Start-Process -FilePath "C:\Program Files\SimVascular\SimVascular\2023-03-27\sv.bat" --python`
+Start-Process -FilePath "C:\Program Files\SimVascular\SimVascular\2023-03-27\sv.bat" --python
 ```
 and then get all the methods with
 ```python
