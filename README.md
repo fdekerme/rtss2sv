@@ -7,14 +7,17 @@ To use it:
 
 2) SimVascular's PythonAPI isn't easy to install (with `pip install sv`, for example) and it's not possible (I think, to check) to install a third-party package (like `pydicom`, for example). As a result, you need to run the `main.py` code with the following function (or equivalent under Linux/MacOS, see https://simvascular.github.io/documentation/python_interface.html):
 
-	`Start-Process -FilePath "C:\Program Files\SimVascular\SimVascular\2023-03-27\sv.bat" -NoNewWindow -ArgumentList "--python", "-- C:\Users\user_name\Documents\Code_python\dcm2ctgr\main.py"`
+```powershell
+Start-Process -FilePath "C:\Program Files\SimVascular\SimVascular\2023-03-27\sv.bat" -NoNewWindow -ArgumentList "--python", "-- C:\Users\user_name\Documents\Code_python\dcm2ctgr\main.py"
+```
 
 A simple prompt can be launched with:
 
-	`Start-Process -FilePath ""C:\Program Files\SimVascular\SimVascular\2023-03-27\sv.bat" --python`
-
-and then get all the methods with
+```powershell
+Start-Process -FilePath ""C:\Program Files\SimVascular\SimVascular\2023-03-27\sv.bat" --python`
 ```
+and then get all the methods with
+```python
 import sv
 help(sv.segmentation.Contour())
 ```
@@ -31,13 +34,14 @@ More things to note:
 
 - maybe check the way I did the scaling (`scaling_factor`), comparing to https://github.com/ktbolt/cardiovascular/tree/master/scale-contours-ctgr/python
 - The code part:
+```python
+number_of_subdivision = 10
+path = sv.pathplanning.Path()
+path.set_subdivision_method("SUBDIVISION", number_of_subdivision)
 ```
-	number_of_subdivision = 10
-    path = sv.pathplanning.Path()
-    path.set_subdivision_method("SUBDIVISION", number_of_subdivision)
+as well as the
+```python
+_get_control_points_id(path)
 ```
-	as well as the
-
-	`_get_control_points_id(path)`
 
 may seem strange. The problem is the following: I generate the path's control points via RTSS contours (seg.get_center()). I then define the path via path.set_control_points(path_control_points). The API then automatically interpolates between these points to form a "curve". So, a Path may have 20 control points, but its Curve is made up of 200 points. Each of these points is characterized by its ID. However, once the Path has been generated, there is no method (as far as I know) for tracing the ID of the control points. And it's precisely at these control points that the segmentation points are located. This code can therefore be used to find out the ID of the control points in the interpolated curve.  
